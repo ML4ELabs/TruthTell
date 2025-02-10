@@ -1,27 +1,49 @@
 "use client"
 import React, { FC, useState } from "react";
+import { getJson } from "serpapi";
 
 interface TextProps {}
 
 const Text: FC<TextProps> = () => {
   const [text, setText] = useState("");
   const [words, setWords] = useState<string[]>([]);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newText = e.target.value;
     setText(newText);
 
-    // Check if the last character is a space, indicating word completion
     if (newText.endsWith(" ")) {
-      // Split the text into words and remove any empty strings
-      const newWords = newText.trim().split(" ").filter(Boolean);
-      // Get the last word from the newWords array
+      const newWords = newText.trim().split(/\s+/);
       const lastWord = newWords[newWords.length - 1];
-      // Update the words state with the new word
       setWords((prevWords) => [...prevWords, lastWord]);
+
+      if (newWords.length % 10 === 0) {
+        const query = newWords.slice(-10).join(" ");
+        console.log(`Searching for: ${query}`);
+        await performSearch(query);
+      }
     }
-    console.log(words)
   };
+
+  const performSearch = async (query: string) => {
+    try {
+      const response = await fetch('/api/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query }),
+      });
+  
+      const data = await response.json();
+      console.log(data)
+      // Process and display the search results
+    } catch (error) {
+      console.error('Error fetching search results:', error);
+    }
+  };
+  
 
   return (
     <div>
@@ -41,12 +63,12 @@ const Text: FC<TextProps> = () => {
         {text}
       </p>
       <div>
-        <h2 className="font-bold text-xl">Completed Words:</h2>
-        <ul>
-          {words.map((word, index) => (
-            <li key={index}>{word}</li>
-          ))}
-        </ul>
+        {searchResults.map((result, index) => (
+          <div key={index}>
+            <h2>Search Results for Group {index + 1}:</h2>
+            {/* Render your search results here */}
+          </div>
+        ))}
       </div>
     </div>
   );
