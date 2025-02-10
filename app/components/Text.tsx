@@ -1,58 +1,53 @@
-//@ts-nocheck
-"use client";
-import { FC, useState, useEffect, useRef } from "react";
+"use client"
+import React, { FC, useState } from "react";
 
 interface TextProps {}
 
-const Text: FC<TextProps> = ({}) => {
-  // Use state to htextold the user-entered text instead of a transcript from speech recognition
+const Text: FC<TextProps> = () => {
   const [text, setText] = useState("");
-  // Use a ref to store the task counter persistently
-  let task = 0;
+  const [words, setWords] = useState<string[]>([]);
 
-  useEffect(() => {
-    const words = text.split(" ");
-    if (words.length > 0 && words.length % 5 === 0) {
-      console.log(text + " " + words.length);
-      const query = words.slice(task, task + 5).join(" ");
-      task = task + 5;
-      console.log("query" + query)
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newText = e.target.value;
+    setText(newText);
 
-      const fetchData = async () => {
-        const url = `/api/search?query=${encodeURIComponent(query)}`;
-        try {
-          const response = await fetch(url);
-          const res = await response.json();
-          console.log(res.organic_results)
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      };
-  
-      fetchData();
+    // Check if the last character is a space, indicating word completion
+    if (newText.endsWith(" ")) {
+      // Split the text into words and remove any empty strings
+      const newWords = newText.trim().split(" ").filter(Boolean);
+      // Get the last word from the newWords array
+      const lastWord = newWords[newWords.length - 1];
+      // Update the words state with the new word
+      setWords((prevWords) => [...prevWords, lastWord]);
     }
-
-  }, [text]);
+    console.log(words)
+  };
 
   return (
     <div>
       <h1 className="lg:text-5xl font-bold underline decoration-wavy text-2xl">
         VeriVoice: Real-Time Text Fact-Check
       </h1>
-      {/* A text input to enter text in real time */}
       <input
         type="text"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
+        onChange={handleChange}
         placeholder="Type your text here..."
         className="border p-2 w-full mb-4"
       />
       <p className="mt-6 pb-32 mb-4 rounded-md bg-base-100">
         <span className="ml-2 font-bold text-xl bg-base-100">
-          generated text:
+          Generated text:
         </span>
         {text}
       </p>
+      <div>
+        <h2 className="font-bold text-xl">Completed Words:</h2>
+        <ul>
+          {words.map((word, index) => (
+            <li key={index}>{word}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
