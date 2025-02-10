@@ -1,6 +1,4 @@
-// app/api/search/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import axios from 'axios';
 
 export async function POST(request: NextRequest) {
   const { query } = await request.json();
@@ -10,15 +8,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const response = await axios.get('https://serpapi.com/search', {
-      params: {
-        engine: 'google',
-        q: query,
-        api_key: process.env.SERP_API_KEY,
-      },
-    });
+    const serpApiKey = process.env.SERP_API_KEY;
+    const serpApiUrl = `https://serpapi.com/search?engine=google&q=${encodeURIComponent(query)}&api_key=${serpApiKey}`;
 
-    return NextResponse.json(response.data);
+    const response = await fetch(serpApiUrl);
+    const data = await response.json();
+    // modi lost election in center he is removed from power
+    return NextResponse.json(data["organic_results"][0]["snippet"]);
   } catch (error) {
     console.error('Error fetching data from SerpApi:', error);
     return NextResponse.json({ error: 'Error fetching data from SerpApi' }, { status: 500 });
