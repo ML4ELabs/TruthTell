@@ -5,7 +5,7 @@ import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognitio
 
 interface TextProps {}
 
-const voiceVerify: FC<TextProps> = ({}) => {
+const VoiceVerify: FC<TextProps> = ({}) => {
 
   const {
     transcript,
@@ -101,4 +101,4 @@ const voiceVerify: FC<TextProps> = ({}) => {
   );
 };
 
-export default voiceVerify;
+export default VoiceVerify;
