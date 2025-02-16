@@ -27,13 +27,13 @@ const VoiceVerify: FC<TextProps> = ({}) => {
       setTextLen(textlen+10);
       const searchData = performSearch(query);
       setSearchResults([...searchResults, searchData]);
-
-      const factCheckData = performFactCheck(query);
-      setFactCheckResults([...factCheckResults, factCheckData]);
     }
-
-    console.log(words)
   }, [transcript]);
+
+  useEffect(() => {
+    const factCheckData = performFactCheck(searchResults[searchResults.length - 1]);
+    setFactCheckResults([...factCheckResults, factCheckData]);
+  }, [searchResults]);
 
   const performSearch = async (query: string) => {
     try {
