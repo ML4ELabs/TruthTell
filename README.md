@@ -3,6 +3,6 @@
 ## Tasks
 
 - Fix the text verify layout [x]
-- Setup the voice verify layout [ ]
-- Make a internet article link verifieer [ ]
-- Make a youtube verifier [ ]
+- Setup the voice verify layout [x]
+- Make a internet article link verifier [x]
+- Make a youtube verifier [x]
