@@ -1,5 +1,6 @@
 //@ts-nocheck
 "use client";
+import 'regenerator-runtime/runtime'
 import { FC, useEffect, useState } from "react";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 
@@ -19,21 +20,36 @@ const VoiceVerify: FC<TextProps> = ({}) => {
     const [factCheckResults, setFactCheckResults] = useState<any[]>([]);
   
 
-  useEffect(() => {
-    const newText = transcript;
-    const words = newText.trim().split(" ");
-    if (words.length == textlen+10) {
-      const query = words.slice(textlen, textlen+10).join(" ");
-      setTextLen(textlen+10);
-      const searchData = performSearch(query);
-      setSearchResults([...searchResults, searchData]);
-    }
-  }, [transcript]);
-
-  useEffect(() => {
-    const factCheckData = performFactCheck(searchResults[searchResults.length - 1]);
-    setFactCheckResults([...factCheckResults, factCheckData]);
-  }, [searchResults]);
+    useEffect(() => {
+      console.log("transcript:", transcript);
+      const words = transcript.trim().split(" ");
+      
+      if (words.length === textlen + 10) {
+        const query = words.slice(textlen, textlen + 10).join(" ");
+        setTextLen(prevLen => prevLen + 10);
+        
+        const searchData = performSearch(query);
+        setSearchResults(prevResults => [...prevResults, searchData]);
+      }
+    }, [transcript]);
+    
+    useEffect(() => {
+      if (searchResults.length === 0) return; // Prevent running on empty array
+      
+      const fetchFactCheck = async () => {
+        console.log(searchResults);
+        const searchResult = searchResults[searchResults.length - 1];
+        console.log("searchResult:", searchResult);
+    
+        const factCheckData = await performFactCheck(searchResult);
+        console.log("factCheckData:", factCheckData);
+        
+        setFactCheckResults(prevResults => [...prevResults, factCheckData]);
+      };
+    
+      fetchFactCheck();
+    }, [searchResults]);
+    
 
   const performSearch = async (query: string) => {
     try {

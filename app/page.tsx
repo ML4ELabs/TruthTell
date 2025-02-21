@@ -1,104 +1,113 @@
-'use client';
+"use client";
+import 'regenerator-runtime/runtime'
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-import React, { useState } from 'react';
+export default function LandingPage() {
+  const router = useRouter();
+  const [mouseX, setMouseX] = useState(0);
+  const [mouseY, setMouseY] = useState(0);
+  const [cursorX, setCursorX] = useState(0);
+  const [cursorY, setCursorY] = useState(0);
 
-const TextComponent: React.FC = () => {
-  const [text, setText] = useState('');
-  const [words, setWords] = useState<string[]>([]);
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [factCheckResults, setFactCheckResults] = useState<any[]>([]);
 
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newText = e.target.value;
-    setText(newText);
+  useEffect(() => {
+    const handleMouseMove = (e: { clientX: number; clientY: number; }) => {
+      setMouseX(e.clientX * 1.7);
+      setMouseY(e.clientY * 1.9);
+    };
 
-    if (newText.endsWith(' ')) {
-      const newWords = newText.trim().split(/\s+/);
-      const lastWord = newWords[newWords.length - 1];
-      setWords((prevWords) => [...prevWords, lastWord]);
+    window.addEventListener("mousemove", handleMouseMove);
 
-      if (newWords.length % 10 === 0) {
-        const query = newWords.slice(-10).join(' ');
-        console.log(`Searching for: ${query}`);
-        const searchData = await performSearch(query);
-        setSearchResults((prevResults) => [...prevResults, searchData]);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
 
-        const factCheckData = await performFactCheck(query);
-        setFactCheckResults((prevResults) => [...prevResults, factCheckData]);
-      }
-    }
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCursorX((prevX) => prevX + (mouseX - prevX) * 0.1);
+      setCursorY((prevY) => prevY + (mouseY - prevY) * 0.1);
+    }, 16); // 60 FPS
 
-  const performSearch = async (query: string) => {
-    try {
-      const response = await fetch('/api/search', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query }),
-      });
+    return () => clearInterval(interval);
+  }, [mouseX, mouseY]);
 
-      const data = await response.json();
-      console.log(data)
-      return data;
-    } catch (error) {
-      console.error('Error fetching search results:', error);
-      return null;
-    }
-  };
-
-  const performFactCheck = async (text: string) => {
-    try {
-      const response = await fetch('/api/fact-check', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ text }),
-      });
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Error performing fact-check:', error);
-      return null;
-    }
-  };
 
   return (
     <div>
-      <h1 className="lg:text-5xl font-bold underline decoration-wavy text-2xl">
-        VeriVoice: Real-Time Text Fact-Check
-      </h1>
-      <input
-        type="text"
-        onChange={handleChange}
-        placeholder="Type your text here..."
-        className="border p-2 w-full mb-4"
-      />
-      <p className="mt-6 pb-32 mb-4 rounded-md bg-base-100">
-        <span className="ml-2 font-bold text-xl bg-base-100">Generated text:</span>
-        {text}
-      </p>
-      <div>
-        {searchResults.map((result, index) => (
-          <div key={index}>
-            <h2>Search Results for Group {index + 1}:</h2>
-            {result}
+      <h1 className="text-center">ZeroTrust</h1>
+    <div className="relative flex h-screen font-sans overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
+      
+
+      {/* Left Section */}
+      <div className="flex flex-1 items-center justify-center p-2 md:p-10 lg:p-20 bg-gradient-to-r from-[#13315C] to-[#1E3A8A]">
+        <div className="flex flex-col items-center cursor-pointer group">
+          <div className="w-20 h-20 md:w-40 md:h-40 lg:w-60 lg:h-60 rounded-full bg-yellow-300 shadow-xl animate-glow group-hover:scale-110 transition-transform duration-300">
+            <img src="/bulb.png"/>
           </div>
-        ))}
+          <button
+            className="bg-black text-white text-sm md:text-lg lg:text-xl font-bold py-2 px-4 md:py-3 md:px-6 lg:py-3 lg:px-6 mt-20 rounded-full border-2 border-yellow-100 transition-transform duration-300 transform hover:scale-105 hover:shadow-xl"
+            onClick={() => {
+              router.push("./voiceVerify");
+            }}
+          >
+            Voice Verify
+          </button>
+          
+          {/* <p className="text-white text-center mt-3 md:text-lg lg:text-xl">
+            Surf through and get the true insights with our voice analysis tool.
+          </p> */}
+          
+          {/* Terminal Section */}
+          
+        </div>
       </div>
-      <div>
-        {factCheckResults.map((result, index) => (
-          <div key={index}>
-            <h2>Fact-Check Results for Group {index + 1}:</h2>
-            {result}
+      <div className="flex flex-1 items-center justify-center p-2 md:p-10 lg:p-20 bg-gradient-to-r from-[#13315C] to-[#1E3A8A]">
+        <div className="flex flex-col items-center cursor-pointer group">
+          <div className="w-20 h-20 md:w-40 md:h-40 lg:w-60 lg:h-60 rounded-full bg-yellow-300 shadow-xl animate-glow group-hover:scale-110 transition-transform duration-300">
+            <img src="/youtube.svg"/>
           </div>
-        ))}
+          <button
+            className="bg-black text-white text-sm md:text-lg lg:text-xl font-bold py-2 px-4 md:py-3 md:px-6 lg:py-3 lg:px-6 mt-20 rounded-full border-2 border-yellow-100 transition-transform duration-300 transform hover:scale-105 hover:shadow-xl"
+            onClick={() => {
+              router.push("./youtubeVerify");
+            }}
+          >
+            Youtube Verify
+          </button>
+          
+          {/* <p className="text-white text-center mt-3 md:text-lg lg:text-xl">
+            Surf through and get the true insights with our voice analysis tool.
+          </p> */}
+          
+          {/* Terminal Section */}
+          
+        </div>
+      </div>
+      {/* Right Section */}
+      <div className="flex flex-1 items-center justify-center p-2 md:p-10 lg:p-20 bg-gradient-to-r from-[#dde1e4] to-[#bbbbbb]">
+        <div className="flex flex-col items-center cursor-pointer group">
+          <img
+            src="/file.svg"
+            alt="YouTube Icon"
+            className="w-30 h-40 md:w-40 md:h-60 lg:w-60 lg:h-80 transition-transform duration-300 hover:scale-110"
+          />
+          <button
+            className="bg-black text-white text-sm md:text-lg lg:text-xl font-bold py-2 px-4 md:py-3 md:px-6 lg:py-3 lg:px-6 mt-5 rounded-full border-2 border-yellow-100 transition-transform duration-300 transform hover:scale-105 hover:shadow-xl"
+            onClick={() => {
+              router.push("./textVerify");
+            }}
+          >
+            Text Verify
+          </button>
+
+          {/* Terminal Section for Right */}
+          
+        </div>
       </div>
     </div>
+    </div>
+    
   );
-};
-
-export default TextComponent;
+}

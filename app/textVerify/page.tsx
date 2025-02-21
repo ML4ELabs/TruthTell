@@ -9,6 +9,7 @@ const TextComponent: React.FC = () => {
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newText = e.target.value;
+    console.log('New text:', newText);
     setText(newText);
 
     if (newText.endsWith(' ')) {
